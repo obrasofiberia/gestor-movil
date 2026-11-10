@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4B2A6B">
+<meta name="robots" content="noindex,nofollow">
+<title>Gestor Ofiberia</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--mor:#4B2A6B;--mor2:#6B3F8F;--morc:#EFE7F5;--fondo:#F4F2F7;--blanco:#fff;--txt:#1F2330;--txt2:#5E6475;--borde:#E2DEE8;
+--rojo:#C62828;--rojoc:#FDECEC;--nar:#B26A00;--narc:#FFF3E0;--ver:#2E7D32;--verc:#E8F5E9;--gris:#9AA1B5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--fondo);color:var(--txt);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input,select{font:inherit;color:var(--txt)}
+.oculto{display:none!important}
+#login{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--mor);color:#fff}
+#login .logo{width:76px;height:76px;border-radius:20px;background:#fff;color:var(--mor);font-weight:700;font-size:30px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+#login h1{font-size:22px;font-weight:600;margin:0 0 4px}
+#login p{margin:0 0 22px;color:#DCCDEA;font-size:13px;text-align:center}
+#login form{width:100%;max-width:320px}
+#login input[type=password]{width:100%;height:48px;border-radius:12px;border:0;padding:0 14px;font-size:16px}
+#login label{display:flex;gap:8px;align-items:center;margin:14px 0;font-size:14px;color:#EDE3F5}
+#login .btn{width:100%;height:48px;border-radius:12px;background:#fff;color:var(--mor);font-weight:600;font-size:16px}
+#login .err{min-height:20px;color:#FFD2D2;font-size:13px;margin-top:10px;text-align:center}
+#login .pie{position:absolute;bottom:14px;font-size:11px;color:#BFA8D3}
+#app{display:flex;flex-direction:column;height:100%}
+header{background:var(--mor);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px;flex:none}
+header .tit{flex:1;min-width:0}
+header .tit b{display:block;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .tit span{font-size:12px;color:#DCCDEA}
+header button{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+header button:active{background:rgba(255,255,255,.15)}
+header svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 20px}
+nav{flex:none;display:grid;grid-template-columns:repeat(6,1fr);background:var(--blanco);border-top:1px solid var(--borde);padding:6px 2px calc(6px + env(safe-area-inset-bottom))}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--txt2);padding:4px 0;border-radius:10px}
+nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.act{color:var(--mor2);font-weight:600}
+nav button.act svg{stroke-width:2.3}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:9px 12px;text-align:left}
+.kpi b{display:block;font-size:20px;font-weight:600}
+.kpi span{font-size:12px;color:var(--txt2)}
+.kpi.rojo{background:var(--rojoc);border-color:#F6C9C9}.kpi.rojo b{color:var(--rojo)}
+.kpi.naranja{background:var(--narc);border-color:#F7DDB3}.kpi.naranja b{color:var(--nar)}
+.kpi.sel{outline:2px solid var(--mor2)}
+.busca{display:flex;gap:8px;margin-bottom:10px}
+.busca input{flex:1;min-width:0;height:42px;border:1px solid var(--borde);border-radius:12px;padding:0 12px;background:var(--blanco)}
+.busca select{height:42px;border:1px solid var(--borde);border-radius:12px;padding:0 8px;background:var(--blanco);max-width:44%}
+.cuenta{font-size:12px;color:var(--txt2);margin:0 2px 6px}
+.lista{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;overflow:hidden}
+.it{display:flex;width:100%;text-align:left;border-bottom:1px solid #EEEBF2}
+.it:last-child{border-bottom:0}
+.it:active{background:var(--morc)}
+.it i{flex:none;width:4px}
+.it div{flex:1;min-width:0;padding:10px 12px}
+.it b{display:block;font-weight:600;font-size:15px}
+.it small{display:block;font-size:12.5px;color:var(--txt2)}
+.it em{display:block;font-style:normal;font-size:12.5px;margin-top:1px}
+.c-rojo{background:var(--rojo)}.c-naranja{background:#E39B1B}.c-ok{background:transparent}.c-baja{background:var(--gris)}
+.t-rojo{color:var(--rojo)}.t-naranja{color:var(--nar)}.t-ok{color:var(--ver)}.t-baja{color:var(--gris)}
+.vacio{padding:30px 12px;text-align:center;color:var(--txt2);font-size:14px}
+.mas{display:block;width:100%;padding:12px;color:var(--mor2);font-weight:600;text-align:center}
+.ficha h2{font-size:20px;margin:2px 0 4px;font-weight:600;line-height:1.25}
+.ficha .sub{font-size:13px;color:var(--txt2);margin-bottom:8px}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;margin-bottom:8px;background:var(--morc);color:var(--mor)}
+.badge.rojo{background:var(--rojoc);color:var(--rojo)}.badge.naranja{background:var(--narc);color:var(--nar)}.badge.ok{background:var(--verc);color:var(--ver)}
+.volver{display:flex;align-items:center;gap:4px;color:var(--mor2);font-weight:600;margin-bottom:8px;font-size:14px}
+.volver svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.tile{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:9px 11px;min-width:0}
+.tile span{display:block;font-size:11.5px;color:var(--txt2)}
+.tile b{display:block;font-size:15px;font-weight:600;margin:1px 0;overflow-wrap:anywhere}
+.tile small{display:block;font-size:11.5px;color:var(--txt2);overflow-wrap:anywhere}
+.tile .barra{height:5px;background:#ECE8F1;border-radius:3px;margin-top:5px;overflow:hidden}
+.tile .barra i{display:block;height:100%;background:var(--ver)}
+.tile.rojo b{color:var(--rojo)}.tile.rojo .barra i{background:var(--rojo)}
+.tile.naranja b{color:var(--nar)}.tile.naranja .barra i{background:#E39B1B}
+.pest{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;padding-bottom:2px}
+.pest button{flex:none;padding:7px 12px;border-radius:999px;background:var(--blanco);border:1px solid var(--borde);font-size:13px}
+.pest button.act{background:var(--mor);border-color:var(--mor);color:#fff}
+.fila{display:flex;width:100%;text-align:left;border-bottom:1px solid #EEEBF2}
+.fila:last-child{border-bottom:0}
+.fila i{flex:none;width:4px}
+.fila div{flex:1;min-width:0;padding:9px 12px}
+.fila b{display:block;font-weight:600;font-size:14.5px}
+.fila p{margin:1px 0 0;font-size:12.5px;color:var(--txt2);overflow-wrap:anywhere}
+.fila p span{color:var(--txt)}
+.fila.link:active{background:var(--morc)}
+.fila .flecha{flex:none;align-self:center;padding-right:10px;color:var(--gris)}
+.irbtn{display:block;width:100%;margin-top:10px;padding:12px;border-radius:12px;background:var(--mor);color:#fff;font-weight:600;text-align:center}
+.aviso{background:var(--narc);color:var(--nar);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.cargando{position:fixed;inset:0;background:rgba(40,20,55,.35);display:flex;align-items:center;justify-content:center;z-index:9}
+.cargando div{background:#fff;border-radius:14px;padding:16px 22px;font-weight:600}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="logo">GD</div>
+  <h1>Gestor de documentación</h1>
+  <p id="l_fecha">Ofiberia Oficina Técnica · solo consulta</p>
+  <form id="f_login" autocomplete="off">
+    <input type="password" id="pwd" placeholder="Contraseña" autocomplete="current-password" required>
+    <label><input type="checkbox" id="recordar" checked> Recordar en este móvil</label>
+    <button class="btn" type="submit">Entrar</button>
+    <div class="err" id="l_err"></div>
+  </form>
+  <div class="pie">© Francisco Estévez González</div>
+</div>
+<div id="app" class="oculto">
+  <header>
+    <div class="tit"><b id="h_tit">Avisos</b><span id="h_fecha"></span></div>
+    <button id="b_act" aria-label="Actualizar datos"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4M4 4v4h4M4 13a8 8 0 0 0 14.9 4M20 20v-4h-4"/></svg></button>
+    <button id="b_salir" aria-label="Bloquear"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
+  </header>
+  <main id="main"></main>
+  <nav id="nav"></nav>
+</div>
+<div id="carga" class="cargando oculto"><div>Cargando…</div></div>
+<script>
+"use strict";
+const ICON={
+ bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+ obra:'<path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/>',
+ pers:'<circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 3.1a4 4 0 0 1 0 7.8M21 21v-2a4 4 0 0 0-3-3.9"/>',
+ emp:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+ piso:'<path d="M3 21h18M4 21V4h10v17M14 9h6v12M7 8h3M7 12h3M7 16h3"/>',
+ flota:'<path d="M3 17V7h11v10M14 10h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/>'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const ub64=u=>btoa(String.fromCharCode(...u));
+const LS="gd_clave_v1";
+let D=null, ENC=null, estado={sec:null,filtro:{},q:{},lim:{},kpi:{}}, pila=[];
+
+async function bajar(){
+  const r=await fetch("data.enc?t="+Date.now(),{cache:"no-store"});
+  if(!r.ok) throw new Error("No hay datos publicados todavía");
+  return await r.json();
+}
+async function derivar(pwd,salt,it){
+  const k=await crypto.subtle.importKey("raw",new TextEncoder().encode(pwd),"PBKDF2",false,["deriveBits"]);
+  return new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt,iterations:it},k,512));
+}
+async function descifrar(enc,clave){
+  const iv=b64(enc.iv), ct=b64(enc.ct), mac=b64(enc.mac);
+  const km=await crypto.subtle.importKey("raw",clave.slice(32),{name:"HMAC",hash:"SHA-256"},false,["verify"]);
+  const datos=new Uint8Array(iv.length+ct.length); datos.set(iv); datos.set(ct,iv.length);
+  if(!await crypto.subtle.verify("HMAC",km,mac,datos)) throw new Error("Contraseña incorrecta");
+  const ke=await crypto.subtle.importKey("raw",clave.slice(0,32),{name:"AES-CTR"},false,["decrypt"]);
+  const z=await crypto.subtle.decrypt({name:"AES-CTR",counter:iv,length:64},ke,ct);
+  const st=new Blob([z]).stream().pipeThrough(new DecompressionStream("deflate"));
+  return JSON.parse(await new Response(st).text());
+}
+function carga(v){$("#carga").classList.toggle("oculto",!v)}
+async function entrar(pwd){
+  carga(true);
+  try{
+    const enc=ENC||await bajar(); ENC=enc;
+    let clave=null, guard=null;
+    try{guard=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
+    if(pwd==null){ if(!guard||guard.salt!==enc.salt) throw new Error(""); clave=b64(guard.k); }
+    else clave=await derivar(pwd,b64(enc.salt),enc.it);
+    D=await descifrar(enc,clave);
+    if(pwd!=null){ try{ if($("#recordar").checked) localStorage.setItem(LS,JSON.stringify({salt:enc.salt,k:ub64(clave)})); else localStorage.removeItem(LS);}catch(e){} }
+    $("#login").classList.add("oculto"); $("#app").classList.remove("oculto");
+    $("#h_fecha").textContent="Datos del "+D.fecha+" · solo consulta";
+    pintarNav(); if(!estado.sec) irSec(D.secciones[0].key,true); else render();
+  }catch(e){
+    if(pwd!=null) $("#l_err").textContent=e.message||"No se pudieron abrir los datos";
+    if(e.message==="Contraseña incorrecta"&&pwd==null){try{localStorage.removeItem(LS)}catch(_){}}
+    $("#login").classList.remove("oculto"); $("#app").classList.add("oculto");
+  }finally{carga(false)}
+}
+function sec(k){return D.secciones.find(s=>s.key===k)}
+function pintarNav(){
+  $("#nav").innerHTML=D.secciones.map(s=>`<button data-k="${s.key}" class="${s.key===estado.sec?'act':''}"><svg viewBox="0 0 24 24">${ICON[s.icono]||""}</svg>${esc(s.corto)}</button>`).join("");
+  $("#nav").querySelectorAll("button").forEach(b=>b.onclick=()=>irSec(b.dataset.k));
+}
+function irSec(k,reemplazar){
+  estado.sec=k; pila=[]; const v={sec:k};
+  reemplazar?history.replaceState(v,""):history.pushState(v,""); pintarNav(); render(); $("#main").scrollTop=0;
+}
+function abrirFicha(k,id){
+  const v={sec:k,id:String(id)}; pila.push(v); estado.sec=k; history.pushState(v,""); pintarNav(); render(); $("#main").scrollTop=0;
+}
+window.onpopstate=e=>{ if(!D) return; const v=e.state||{sec:D.secciones[0].key}; estado.sec=v.sec; pila=v.id?[v]:[]; pintarNav(); render(); };
+function render(){
+  const s=sec(estado.sec); const top=pila[pila.length-1];
+  $("#h_tit").textContent=s.titulo;
+  if(top&&top.id!=null) return renderFicha(s,top.id);
+  renderLista(s);
+}
+function renderLista(s){
+  const k=s.key, fil=estado.filtro[k]??0, q=(estado.q[k]||"").toLowerCase().trim(), lim=estado.lim[k]||60;
+  const pr={rojo:0,naranja:1,ok:2,baja:3};
+  let its=s.items.filter(it=>(!q||(it.q||it.t1).toLowerCase().includes(q))&&(!it.f||it.f.includes(fil)));
+  its.sort((a,b)=>(pr[a.col]-pr[b.col])||((a.o||0)-(b.o||0))||a.t1.localeCompare(b.t1,"es"));
+  let h=`<div class="kpis">${s.kpis.map((x,i)=>`<button class="kpi ${x.col!=="ok"&&x.v!=="0"&&x.v!=="0,00 €"?x.col:""} ${x.fil!=null&&x.fil===fil?'sel':''}" data-f="${x.fil??''}"><b>${esc(x.v)}</b><span>${esc(x.t)}</span></button>`).join("")}</div>`;
+  h+=`<div class="busca"><input id="q" type="search" placeholder="Buscar…" value="${esc(estado.q[k]||"")}"><select id="fil">${s.filtros.map((f,i)=>`<option value="${i}" ${i===fil?'selected':''}>${esc(f)}</option>`).join("")}</select></div>`;
+  h+=`<div class="cuenta">${its.length} de ${s.items.length}</div>`;
+  if(!its.length) h+=`<div class="lista"><div class="vacio">No hay nada con ese filtro</div></div>`;
+  else{
+    h+=`<div class="lista">`+its.slice(0,lim).map(it=>`<button class="it" data-id="${esc(it.id)}"><i class="c-${it.col}"></i><div><b class="${it.col==='rojo'?'t-rojo':(it.col==='baja'?'t-baja':'')}">${esc(it.t1)}</b><small>${esc(it.t2)}</small><em class="t-${it.col==='ok'?'ok':it.col}">${esc(it.t3)}</em></div></button>`).join("");
+    if(its.length>lim) h+=`<button class="mas" id="mas">Ver ${Math.min(60,its.length-lim)} más</button>`;
+    h+=`</div>`;
+  }
+  $("#main").innerHTML=h;
+  const qi=$("#q"); qi.oninput=()=>{estado.q[k]=qi.value; estado.lim[k]=60; const p=qi.selectionStart; renderLista(s); const n=$("#q"); n.focus(); n.setSelectionRange(p,p);};
+  $("#fil").onchange=e=>{estado.filtro[k]=+e.target.value; estado.lim[k]=60; renderLista(s)};
+  document.querySelectorAll(".kpi").forEach(b=>b.onclick=()=>{ if(b.dataset.f==="") return; const f=+b.dataset.f; estado.filtro[k]=(fil===f?0:f); renderLista(s);});
+  document.querySelectorAll(".it").forEach(b=>b.onclick=()=>abrirFicha(k,b.dataset.id));
+  const m=$("#mas"); if(m) m.onclick=()=>{estado.lim[k]=lim+60; renderLista(s)};
+}
+function renderFicha(s,id){
+  const f=s.fichas[id];
+  if(!f){ $("#main").innerHTML=`<button class="volver" id="vol">${flecha()} Volver</button><div class="vacio">No se encuentra este elemento.</div>`; $("#vol").onclick=()=>history.back(); return;}
+  const tk=s.key+":"+id; const tab=estado.kpi[tk]||0;
+  let h=`<div class="ficha"><button class="volver" id="vol">${flecha()} ${esc(s.titulo)}</button><h2>${esc(f.tit)}</h2>`;
+  if(f.badge) h+=`<span class="badge ${f.badge[1]}">${esc(f.badge[0])}</span>`;
+  if(f.sub) h+=`<div class="sub">${esc(f.sub)}</div>`;
+  h+=`<div class="tiles">${(f.tiles||[]).map(t=>`<div class="tile ${t.col||''}"><span>${esc(t.a)}</span><b>${esc(t.b)}</b>${t.d?`<small>${esc(t.d)}</small>`:""}${t.frac!=null?`<div class="barra"><i style="width:${Math.round(t.frac*100)}%"></i></div>`:""}</div>`).join("")}</div>`;
+  const tabs=(s.tabs||[]).map((t,i)=>({t,filas:(f.tabs||[])[i]||[]}));
+  if(tabs.length){
+    h+=`<div class="pest">${tabs.map((x,i)=>`<button data-t="${i}" class="${i===tab?'act':''}">${esc(x.t.nombre)} (${x.filas.length})</button>`).join("")}</div>`;
+    const x=tabs[tab]; const ir=x.t.ir;
+    h+=`<div class="lista">`;
+    if(!x.filas.length) h+=`<div class="vacio">Sin datos</div>`;
+    h+=x.filas.map(r=>{ const [rid,cel,col]=r; const det=cel.slice(1).map((c,j)=>c!==""&&c!=null?`<p>${esc(x.t.cols[j+1])}: <span>${esc(c)}</span></p>`:"").join("");
+      const link=ir&&sec(ir)&&sec(ir).fichas[rid];
+      return `<button class="fila ${link?'link':''}" ${link?`data-ir="${ir}" data-id="${esc(rid)}"`:""}><i class="c-${col}"></i><div><b class="${col==='rojo'?'t-rojo':''}">${esc(cel[0])}</b>${det}</div>${link?'<span class="flecha">›</span>':''}</button>`}).join("");
+    h+=`</div>`;
+  }
+  if(f.ir&&sec(f.ir[0])&&sec(f.ir[0]).fichas[f.ir[1]]) h+=`<button class="irbtn" id="irf">Ver ${esc(f.ir[2]||"su ficha")}</button>`;
+  h+=`</div>`;
+  $("#main").innerHTML=h;
+  $("#vol").onclick=()=>history.back();
+  document.querySelectorAll(".pest button").forEach(b=>b.onclick=()=>{estado.kpi[tk]=+b.dataset.t; renderFicha(s,id)});
+  document.querySelectorAll(".fila.link").forEach(b=>b.onclick=()=>abrirFicha(b.dataset.ir,b.dataset.id));
+  const irf=$("#irf"); if(irf) irf.onclick=()=>abrirFicha(f.ir[0],f.ir[1]);
+}
+function flecha(){return '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>'}
+$("#f_login").onsubmit=e=>{e.preventDefault(); $("#l_err").textContent=""; entrar($("#pwd").value); $("#pwd").value="";};
+$("#b_salir").onclick=()=>{ if(!confirm("¿Bloquear y olvidar la contraseña en este móvil?")) return; try{localStorage.removeItem(LS)}catch(e){} D=null; estado={sec:null,filtro:{},q:{},lim:{},kpi:{}}; $("#app").classList.add("oculto"); $("#login").classList.remove("oculto"); $("#main").innerHTML="";};
+$("#b_act").onclick=async()=>{ ENC=null; try{ENC=await bajar()}catch(e){alert(e.message);return} const cl=JSON.parse(localStorage.getItem(LS)||"null"); if(cl&&cl.salt===ENC.salt) entrar(null); else{ D=null; $("#app").classList.add("oculto"); $("#login").classList.remove("oculto"); $("#l_err").textContent="Datos actualizados: vuelve a escribir la contraseña"; } };
+(async()=>{
+  if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+  try{ ENC=await bajar(); $("#l_fecha").textContent="Datos del "+ENC.fecha+" · solo consulta"; }catch(e){ $("#l_err").textContent=e.message; return; }
+  let g=null; try{g=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
+  if(g&&g.salt===ENC.salt) entrar(null);
+})();
+</script>
+</body>
+</html>
