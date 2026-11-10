@@ -53,6 +53,7 @@ nav button.act svg{stroke-width:2.3}
 .busca{display:flex;gap:8px;margin-bottom:10px}
 .busca input{flex:1;min-width:0;height:42px;border:1px solid var(--borde);border-radius:12px;padding:0 12px;background:var(--blanco)}
 .busca select{height:42px;border:1px solid var(--borde);border-radius:12px;padding:0 8px;background:var(--blanco);max-width:44%}
+.filtro{display:flex;justify-content:space-between;width:100%;background:var(--morc);color:var(--mor);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;margin-bottom:8px}
 .cuenta{font-size:12px;color:var(--txt2);margin:0 2px 6px}
 .lista{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;overflow:hidden}
 .it{display:flex;width:100%;text-align:left;border-bottom:1px solid #EEEBF2}
@@ -145,7 +146,7 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;"
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const ub64=u=>btoa(String.fromCharCode(...u));
 const LS="gd_clave_v1";
-let D=null, ENC=null, estado={sec:null,filtro:{},q:{},lim:{},kpi:{}}, pila=[];
+let D=null, ENC=null, estado={sec:null,filtro:{},q:{},lim:{},kpi:{},chip:{}}, pila=[];
 
 async function bajar(){
   const r=await fetch("data.enc?t="+Date.now(),{cache:"no-store"});
@@ -212,9 +213,11 @@ function render(){
 function renderLista(s){
   const k=s.key, fil=estado.filtro[k]??0, q=(estado.q[k]||"").toLowerCase().trim(), lim=estado.lim[k]||60;
   const pr={rojo:0,naranja:1,ok:2,baja:3};
-  let its=s.items.filter(it=>(!q||(it.q||it.t1).toLowerCase().includes(q))&&(!it.f||it.f.includes(fil)));
+  const ch=estado.chip[k]; const set=ch?new Set(ch.ids):null;
+  let its=s.items.filter(it=>(!q||(it.q||it.t1).toLowerCase().includes(q))&&(!it.f||it.f.includes(fil))&&(!set||set.has(it.id)));
   its.sort((a,b)=>(pr[a.col]-pr[b.col])||((a.o||0)-(b.o||0))||a.t1.localeCompare(b.t1,"es"));
-  let h=`<div class="kpis">${s.kpis.map((x,i)=>`<button class="kpi ${x.col!=="ok"&&x.v!=="0"&&x.v!=="0,00 €"?x.col:""} ${x.fil!=null&&x.fil===fil?'sel':''}" data-f="${x.fil??''}"><b>${esc(x.v)}</b><span>${esc(x.t)}</span></button>`).join("")}</div>`;
+  let h=`<div class="kpis">${s.kpis.map((x,i)=>`<button class="kpi ${x.col!=="ok"&&x.v!=="0"&&x.v!=="0,00 €"?x.col:""} ${ch&&ch.i===i?'sel':''}" data-i="${i}"><b>${esc(x.v)}</b><span>${esc(x.t)}</span></button>`).join("")}</div>`;
+  if(ch) h+=`<button class="filtro" id="quita">Mostrando: ${esc(ch.t)} <b>✕</b></button>`;
   h+=`<div class="busca"><input id="q" type="search" placeholder="Buscar…" value="${esc(estado.q[k]||"")}"><select id="fil">${s.filtros.map((f,i)=>`<option value="${i}" ${i===fil?'selected':''}>${esc(f)}</option>`).join("")}</select></div>`;
   h+=`<div class="cuenta">${its.length} de ${s.items.length}</div>`;
   if(!its.length) h+=`<div class="lista"><div class="vacio">No hay nada con ese filtro</div></div>`;
@@ -226,7 +229,11 @@ function renderLista(s){
   $("#main").innerHTML=h;
   const qi=$("#q"); qi.oninput=()=>{estado.q[k]=qi.value; estado.lim[k]=60; const p=qi.selectionStart; renderLista(s); const n=$("#q"); n.focus(); n.setSelectionRange(p,p);};
   $("#fil").onchange=e=>{estado.filtro[k]=+e.target.value; estado.lim[k]=60; renderLista(s)};
-  document.querySelectorAll(".kpi").forEach(b=>b.onclick=()=>{ if(b.dataset.f==="") return; const f=+b.dataset.f; estado.filtro[k]=(fil===f?0:f); renderLista(s);});
+  document.querySelectorAll(".kpi").forEach(b=>b.onclick=()=>{ const i=+b.dataset.i, x=s.kpis[i]; estado.lim={};
+    if(x.ir){ estado.chip[x.ir]={ids:x.ids,t:x.t+" ("+s.titulo.toLowerCase()+")",i:-1}; estado.filtro[x.ir]=0; estado.q[x.ir]=""; irSec(x.ir); return; }
+    if(!x.ids||(ch&&ch.i===i)) delete estado.chip[k]; else estado.chip[k]={ids:x.ids,t:x.t,i};
+    estado.filtro[k]=0; renderLista(s); });
+  const qt=$("#quita"); if(qt) qt.onclick=()=>{delete estado.chip[k]; renderLista(s)};
   document.querySelectorAll(".it").forEach(b=>b.onclick=()=>abrirFicha(k,b.dataset.id));
   const m=$("#mas"); if(m) m.onclick=()=>{estado.lim[k]=lim+60; renderLista(s)};
 }
@@ -281,7 +288,7 @@ async function renderMapa(s){
 }
 function flecha(){return '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>'}
 $("#f_login").onsubmit=e=>{e.preventDefault(); $("#l_err").textContent=""; entrar($("#pwd").value); $("#pwd").value="";};
-$("#b_salir").onclick=()=>{ if(!confirm("¿Bloquear y olvidar la contraseña en este móvil?")) return; try{localStorage.removeItem(LS)}catch(e){} D=null; estado={sec:null,filtro:{},q:{},lim:{},kpi:{}}; $("#app").classList.add("oculto"); $("#login").classList.remove("oculto"); $("#main").innerHTML="";};
+$("#b_salir").onclick=()=>{ if(!confirm("¿Bloquear y olvidar la contraseña en este móvil?")) return; try{localStorage.removeItem(LS)}catch(e){} D=null; estado={sec:null,filtro:{},q:{},lim:{},kpi:{},chip:{}}; $("#app").classList.add("oculto"); $("#login").classList.remove("oculto"); $("#main").innerHTML="";};
 $("#b_act").onclick=async()=>{ ENC=null; try{ENC=await bajar()}catch(e){alert(e.message);return} const cl=JSON.parse(localStorage.getItem(LS)||"null"); if(cl&&cl.salt===ENC.salt) entrar(null); else{ D=null; $("#app").classList.add("oculto"); $("#login").classList.remove("oculto"); $("#l_err").textContent="Datos actualizados: vuelve a escribir la contraseña"; } };
 (async()=>{
   if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{});
